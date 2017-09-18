@@ -26,6 +26,8 @@ function startHttpBridge(){
         qos: 2, // 0, 1, or 2
         retain: false // or true
       };
+      console.log('http call:')
+      console.log(JSON.stringify(message));
 
       mqttServer.publish(message, function() {
         res.status(200).send(JSON.stringify(message));

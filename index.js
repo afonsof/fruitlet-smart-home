@@ -27,7 +27,7 @@ function startHttpBridge(){
         retain: false // or true
       };
 
-      server.publish(message, function() {
+      mqttServer.publish(message, function() {
         res.status(200).send(JSON.stringify(message));
       });
   });

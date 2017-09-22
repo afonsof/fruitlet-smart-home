@@ -21,6 +21,7 @@ const device = {
 const cmnd = {
     power: 'cmnd/power',
     setSource: 'cmnd/set-source',
+    setVolume: 'cmnd/set-volume',
     run: 'cmnd/run'
 };
 
@@ -30,6 +31,7 @@ const bedroomLightPower = path.join(room.bedroom, device.light, cmnd.power);
 const batchRun = path.join(room.batch, cmnd.run);
 const livingRoomTvPower = path.join(room.livingRoom, device.tv, cmnd.power);
 const livingRoomTvSetSource = path.join(room.livingRoom, device.tv, cmnd.setSource);
+const livingRoomTvSetVolume = path.join(room.livingRoom, device.tv, cmnd.setVolume);
 
 
 const payloads = {
@@ -37,7 +39,8 @@ const payloads = {
     off: 'OFF',
     turnOffLights: 'TURN-OFF-LIGHTS',
     netflixMode: 'NETFLIX-MODE',
-    sleepMode: 'SLEEP-MODE'
+    sleepMode: 'SLEEP-MODE',
+    silentMode: 'SILENT-MODE'
 };
 
 
@@ -67,6 +70,8 @@ module.exports = function (client, payload) {
                 publish(client, batchRun, payloads.turnOffLights, options),
                 publish(client, livingRoomTvPower, payloads.off, options)
             ]);
+        case payloads.silentMode:
+            return publish(client, livingRoomTvSetVolume, 0.5, options);
     }
     return Promise.resolve();
 };

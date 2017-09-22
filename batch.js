@@ -71,7 +71,7 @@ module.exports = function (client, payload) {
                 publish(client, livingRoomTvPower, payloads.off, options)
             ]);
         case payloads.silentMode:
-            return publish(client, livingRoomTvSetVolume, 0.5, options);
+            return publish(client, livingRoomTvSetVolume, '0.5', options);
     }
     return Promise.resolve();
 };

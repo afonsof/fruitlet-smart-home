@@ -19,7 +19,7 @@ mqttServer.on('published', function(packet) {
 mqttServer.on('ready', () => {
     console.log('MQTT server is running');
 
-    const client = mqtt.connect('mqtt://127.0.0.1');
+    const client = mqtt.connect('mqtt://fruitlet.afonsof.com');
 
     client.on('connect', function () {
         client.subscribe(constants.batchTopic)

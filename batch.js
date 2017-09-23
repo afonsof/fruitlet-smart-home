@@ -1,8 +1,15 @@
 const Promise = require('bluebird');
 
 const config = require('./config')();
-const constants = require('./constants.js');
+
+if (!config || !config.devices) {
+    console.log('The key "devices" was not found at "config.yml"');
+    process.exit(1);
+}
+
 const devices = require('./devices.js')(config);
+const constants = require('./constants.js');
+
 const place = config['place-name'];
 
 const payloads = {
@@ -21,7 +28,7 @@ module.exports = function (client, payload) {
         case payloads.powerOffLights:
             return devices.lights.powerOff(client);
         case payloads.powerOnLights:
-            return devices.lights().powerOn(client);
+            return devices.lights.powerOn(client);
         case payloads.netflixMode:
             return devices.lights.powerOff(client)
                 .then(()=> devices.tv.powerOn(client))

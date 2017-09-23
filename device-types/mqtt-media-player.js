@@ -26,13 +26,13 @@ module.exports = function (deviceSettings, generalSettings) {
         }
     };
     bridge[setSourceTopic] = function (payload) {
-        lgTvCommand(host, 'ssap://system.launcher/launch', {id: payload.toLowerCase()},
+        lgTvCommand(deviceSettings.host, 'ssap://system.launcher/launch', {id: payload.toLowerCase()},
             function (err, res) {
                 console.log('TV Source Changed');
             });
     };
     bridge[setVolumeTopic] = function (payload) {
-        lgTvCommand('ssap://audio/setVolume', {volume: parseInt(payload)},
+        lgTvCommand(deviceSettings.host, 'ssap://audio/setVolume', {volume: parseInt(payload)},
             function (err, res) {
                 console.log('TV Volume Changed');
             });

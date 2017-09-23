@@ -29,7 +29,7 @@ module.exports = function (deviceSettings, generalSettings) {
                 });
         }
     };
-    bridge[setSourceTopic] = function (payload) {
+    bridge[setSourceTopic] = function (payload, callback) {
         lgTvCommand(deviceSettings.host, 'ssap://system.launcher/launch', {id: payload.toLowerCase()},
             function (err) {
                 if (err) {
@@ -38,7 +38,7 @@ module.exports = function (deviceSettings, generalSettings) {
                 return callback(null, {message: 'TV Source changed to ' + payload});
             });
     };
-    bridge[setVolumeTopic] = function (payload) {
+    bridge[setVolumeTopic] = function (payload, callback) {
         lgTvCommand(deviceSettings.host, 'ssap://audio/setVolume', {volume: parseInt(payload)},
             function (err) {
                 if (err) {

@@ -14,5 +14,10 @@ client.on('connect', function () {
 
 client.on('message', function (topic, payload) {
     payload = payload.toString();
-    devices.tv.bridge[topic](payload);
+    devices.tv.bridge[topic](payload, (err,res)=> {
+        if(err){
+            console.error(err);
+        }
+        console.log(res);
+    });
 });

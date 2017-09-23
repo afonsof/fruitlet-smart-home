@@ -8,33 +8,43 @@ module.exports = function (deviceSettings, generalSettings) {
     const setSourceTopic = path.join(mainTopic, 'tv/cmnd/set-source');
 
     let bridge = {};
-    bridge[powerTopic] = function (payload) {
+    bridge[powerTopic] = function (payload, callback) {
         if (payload.toLowerCase() === 'off') {
-            lgTvCommand(deviceSettings.host, 'ssap://system/turnOff', null, function (err, res) {
-                console.log('TV Turned off');
-            });
+            lgTvCommand(deviceSettings.host, 'ssap://system/turnOff', null,
+                function (err) {
+                    if (err) {
+                        return callback(err);
+                    }
+                    return callback(null, {message: 'TV Turned off'});
+                });
         }
         else if (payload.toLowerCase() === 'on') {
             var wol = require('wake_on_lan');
-            wol.wake(deviceSettings.mac, function (error) {
-                if (error) {
-                    // handle error
-                } else {
-                    // done sending packets
-                }
-            });
+            wol.wake(deviceSettings.mac,
+                function (err) {
+                    if (err) {
+                        return callback(err);
+                    }
+                    return callback(null, {message: 'TV Turned on'});
+                });
         }
     };
     bridge[setSourceTopic] = function (payload) {
         lgTvCommand(deviceSettings.host, 'ssap://system.launcher/launch', {id: payload.toLowerCase()},
-            function (err, res) {
-                console.log('TV Source Changed');
+            function (err) {
+                if (err) {
+                    return callback(err);
+                }
+                return callback(null, {message: 'TV Source changed to ' + payload});
             });
     };
     bridge[setVolumeTopic] = function (payload) {
         lgTvCommand(deviceSettings.host, 'ssap://audio/setVolume', {volume: parseInt(payload)},
-            function (err, res) {
-                console.log('TV Volume Changed');
+            function (err) {
+                if (err) {
+                    return callback(err);
+                }
+                return callback(null, {message: 'TV Volume changed to ' + payload});
             });
     };
 
@@ -48,7 +58,7 @@ module.exports = function (deviceSettings, generalSettings) {
             return publish(client, powerTopic, 'OFF');
         },
         setVolume: function (client, volume) {
-            return publish(client, setVolumeTopic, volume);
+            return publish(client, setVolumeTopic, volume.toString());
         },
         setSource: function (client, source) {
             return publish(client, setSourceTopic, source);
@@ -58,16 +68,17 @@ module.exports = function (deviceSettings, generalSettings) {
 };
 
 function lgTvCommand(host, command, payload, callback) {
+    let timeout = payload == 'ssap://system/turnOff' ? 1000 : 15000;
     var lgtv = require("lgtv2")({
-        url: 'ws://' + host + ':3000'
+        url: 'ws://' + host + ':3000',
+        timeout: timeout
     });
 
     lgtv.on('error', function (err) {
-        console.log(err);
+        callback(err);
     });
 
     lgtv.on('connect', function () {
-        console.log('connected');
         lgtv.request(command, payload, function (err, res) {
             lgtv.disconnect();
             callback(err, res);

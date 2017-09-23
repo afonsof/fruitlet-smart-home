@@ -1,3 +1,4 @@
+const Promise = require('bluebird');
 const config = require('./config')();
 const mqttLight = require('./device-types/mqtt-light');
 const mqttMediaPlayer = require('./device-types/mqtt-media-player');

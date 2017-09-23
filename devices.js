@@ -2,6 +2,11 @@ const config = require('./config')();
 const mqttLight = require('./device-types/mqtt-light');
 const mqttMediaPlayer = require('./device-types/mqtt-media-player');
 
+if(!config || !config.devices){
+    console.log('The key "devices" was not found at "config.yml"');
+    process.exit(1);
+}
+
 const devices = config.devices.map(device=> {
     if (device.type === 'light') {
         if (device.driver === 'mqtt-light') {

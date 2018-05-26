@@ -2,37 +2,53 @@ const Promise = require('bluebird');
 const mqttLight = require('./device-types/mqtt-light');
 const mqttMediaPlayer = require('./device-types/mqtt-media-player');
 
-module.exports = function (config) {
-    const devices = config.devices.map(device=> {
-        if (device.type === 'light') {
-            if (device.driver === 'mqtt-light') {
-                return mqttLight(device, config.general);
-            }
-        }
-        if (device.type === 'media-player') {
-            if (device.driver === 'mqtt-media-player') {
-                return mqttMediaPlayer(device, config.general);
-            }
-        }
-        return {};
-    });
+const fs = require("fs");
+const path = require("path");
+const devicesTypes = require("./device-types");
 
-    return {
-        devices: devices,
-        lights: {
-            powerOn: function (client) {
-                return Promise.all(devices
-                    .filter(d=>d.type === 'light')
-                    .map(d=>d.powerOn(client))
-                );
-            },
-            powerOff: function (client) {
-                return Promise.all(devices
-                    .filter(d=>d.type === 'light')
-                    .map(d=>d.powerOff(client))
-                );
+function loadDevicesDefinitions() {
+    return new Promise((resolve, reject) => {
+        const folder = path.join(__dirname, 'device-types');
+        fs.readdir(folder, (err, files) => {
+            if (err) {
+                return reject(err);
             }
-        },
-        tv: devices.filter(d=>d.type === 'media-player')[0]
-    };
+            resolve(files.map(file => require(path.join(folder, file))));
+        });
+    })
+}
+
+hyphenCaseToCamelCase = (str) => str.replace(/-([a-z])/g, g => g[1].toUpperCase());
+
+module.exports = function (config) {
+    return loadDevicesDefinitions()
+        .then(devicesDefinitions => {
+            const devices = config.devices.map(device => {
+                const definition = devicesDefinitions.find(d => d.type === device.type && d.driver === device.driver);
+                if (definition) {
+                    return definition.build(device, config.general);
+                }
+                return {};
+            });
+
+            Object.keys(devicesTypes.enum).forEach(key => {
+                key = devicesTypes.enum[key];
+                const commands = devicesTypes.commands[key];
+                let item = {
+                    type: key,
+                    deviceId: 'all-' + key + 's'
+                };
+                commands.forEach(command => {
+                    command = hyphenCaseToCamelCase(command);
+                    item[command] = function (client) {
+                        return Promise.all(devices
+                            .filter(d => d.type === key)
+                            .map(d => d[command](client))
+                        );
+                    }
+                });
+                devices.push(item)
+            });
+            return devices;
+        });
 };

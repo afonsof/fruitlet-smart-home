@@ -1,8 +1,8 @@
 const Promise = require('bluebird');
 
-module.exports = function (client, topic, payload, options) {
-    return new Promise(function (resolve, reject) {
-        client.publish(topic, payload, options, function (err) {
+module.exports = (client, topic, payload, options) => {
+    return new Promise((resolve, reject) => {
+        client.publish(topic, payload, options, (err) => {
             if (err) {
                 return reject(err);
             }

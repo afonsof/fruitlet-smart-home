@@ -2,9 +2,9 @@ const fs = require("fs");
 const path = require("path");
 const devicesTypes = require("./device-types");
 
-const loadDevicesDefinitions = async () => {
+const loadDevicesDrivers = async () => {
     return new Promise((resolve, reject) => {
-        const folder = path.join(__dirname, 'device-types');
+        const folder = path.join(__dirname, 'device-drivers');
         fs.readdir(folder, (err, files) => {
             if (err) {
                 return reject(err);
@@ -20,11 +20,19 @@ module.exports.DeviceListFactory = class DeviceListFactory {
     }
 
     static async create(config) {
-        const devicesDefinitions = await loadDevicesDefinitions();
+        const devicesDrivers = await loadDevicesDrivers();
+
         const devices = config.devices.map(device => {
-            const definition = devicesDefinitions.find(d => d.type === device.type && d.driver === device.driver);
-            if (definition) {
-                return definition.build(device, config.general);
+            if (device.driver && device.driver.profile) {
+                const profile = config.driverProfiles
+                    .find(p => p.id === device.driver.profile);
+                const cleanProfile = { ...profile };
+                delete cleanProfile.id;
+                device.driver = { ...device.driver, ...cleanProfile };
+            }
+            const driver = devicesDrivers.find(d => d.type === device.type && d.driver === device.driver.id);
+            if (driver) {
+                return driver.build(device, config.general);
             }
             return {};
         });

@@ -58,24 +58,24 @@ module.exports = {
                 [topics.power]: async (payload) => {
                     if (payload.toLowerCase() === 'off') {
                         const uri = buildLgTvUri('system/turnOff');
-                        await lgTvCommand(deviceSettings.host, uri);
+                        await lgTvCommand(deviceSettings.driver.host, uri);
                         return { message: 'TV Turned off' };
                     }
                     else if (payload.toLowerCase() === 'on') {
-                        await wolCommand(deviceSettings.mac);
+                        await wolCommand(deviceSettings.driver.macAddress);
                         return { message: 'TV Turned on' };
                     }
                 },
 
                 [topics.setSource]: async (payload) => {
                     const uri = buildLgTvUri('system.launcher/launch');
-                    await lgTvCommand(deviceSettings.host, uri, { id: payload.toLowerCase() });
+                    await lgTvCommand(deviceSettings.driver.host, uri, { id: payload.toLowerCase() });
                     return { message: 'TV Source changed to ' + payload };
                 },
 
                 [topics.setVolume]: async (payload) => {
                     const uri = buildLgTvUri('audio/setVolume');
-                    await lgTvCommand(deviceSettings.host, uri, { volume: parseInt(payload) });
+                    await lgTvCommand(deviceSettings.driver.host, uri, { volume: parseInt(payload) });
                     return { message: 'TV Volume changed to ' + payload };
                 }
             },

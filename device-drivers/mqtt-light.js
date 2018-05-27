@@ -14,7 +14,7 @@ module.exports = {
         return {
             deviceId: deviceSettings.id,
             type: deviceSettings.type,
-            topics: Object.keys(topics),
+            topics: Object.values(topics),
             powerOn: (client) => publish(client, topics.power, 'ON'),
             powerOff: (client) => publish(client, topics.power, 'OFF'),
         }

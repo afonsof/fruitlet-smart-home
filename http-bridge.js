@@ -7,7 +7,13 @@ module.exports = {
         app.use(bodyParser.json());
         app.post('/publish', (req, res) => {
             let message = {
-                topic: req.body.topic.replace(/\s/g, ''),
+                topic: req.body.topic
+                    .toLowerCase()
+                    .replace('.the ', '. ')
+                    .replace(' the ', ' ')
+                    .replace(' the.', ' .')
+                    .replace(/\s/g, '')
+                ,
                 payload: req.body.message, // or a Buffer
                 qos: 2, // 0, 1, or 2
                 retain: false // or true

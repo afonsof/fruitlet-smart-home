@@ -2,7 +2,7 @@ const path = require('path');
 const yaml = require('js-yaml');
 const fs = require("fs");
 
-module.exports = function () {
+module.exports = () => {
     let config = {};
 
     try {

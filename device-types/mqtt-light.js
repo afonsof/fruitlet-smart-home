@@ -6,19 +6,17 @@ module.exports = {
     commands: ['power-on', 'power-off'],
     type: deviceTypes.enum.light,
     driver: 'mqtt-light',
-    build: function (deviceSettings, generalSettings) {
-        const powerTopic = path.join(generalSettings.place, deviceSettings.topic, 'light/cmnd/power');
+    build: (deviceSettings, generalSettings) => {
+        const topics = {
+            power: path.join(generalSettings.place, deviceSettings.topic, 'light/cmnd/power'),
+        };
 
         return {
             deviceId: deviceSettings.id,
             type: deviceSettings.type,
-            allTopics: [powerTopic],
-            powerOn: function (client) {
-                return publish(client, powerTopic, 'ON');
-            },
-            powerOff: function (client) {
-                return publish(client, powerTopic, 'OFF');
-            }
+            topics: Object.keys(topics),
+            powerOn: (client) => publish(client, topics.power, 'ON'),
+            powerOff: (client) => publish(client, topics.power, 'OFF'),
         }
     }
 };

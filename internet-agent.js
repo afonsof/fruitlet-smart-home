@@ -16,7 +16,7 @@ const { DeviceListFactory } = require('./DeviceListFactory');
     mqttServer.on('clientConnected', client =>
         console.log('client connected', client.id));
 
-    mqttServer.on('published', function (packet) {
+    mqttServer.on('published', (packet) => {
         console.log('=========');
         console.log('Topic:', packet.topic);
         console.log('Payload:', packet.payload.toString());
@@ -27,9 +27,7 @@ const { DeviceListFactory } = require('./DeviceListFactory');
 
         const client = mqtt.connect('mqtt://127.0.0.1');
 
-        client.on('connect', function () {
-            client.subscribe(constants.batchTopic)
-        });
+        client.on('connect', () => client.subscribe(constants.batchTopic));
 
         client.on('message', (topic, payload) => {
             if (topic === constants.batchTopic) {
@@ -41,9 +39,9 @@ const { DeviceListFactory } = require('./DeviceListFactory');
                 }
             }
         });
-        httpBridge.start(mqttServer, function () {
-            console.log('HTTP Bridge Server is running');
-        });
+
+        httpBridge.start(mqttServer, () =>
+            console.log('HTTP Bridge Server is running'));
     });
 })();
 

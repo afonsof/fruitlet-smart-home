@@ -1,17 +1,17 @@
 # Fruitlet Smart Home
 
-Requirements
+## Requirements
 * nodejs
 * pm2 (npm install -g pm2)
 
-# Installation
+## Installation
 ```
 git clone https://github.com/afonsof/fruitlet-smart-home.git
 cd fruitlet-smart-home
 npm install
 ```
 
-# Setting up the config file
+## Setting up the config file
 * Copy the file `config.yml.sample` and rename it to `config.yml`
 * Edit it and insert your devices and batch actions
 
